@@ -38,7 +38,11 @@ const handleBackspace = (ctrlKey: boolean) => {
     }
 };
 
-export const recordTest = (key: string, ctrlKey: boolean) => {
+export const recordTest = (
+    key: string,
+    ctrlKey: boolean,
+    timer_callback: () => any
+) => {
     const { dispatch, getState } = store;
     const {
         time: { timer, timerId },
@@ -52,7 +56,10 @@ export const recordTest = (key: string, ctrlKey: boolean) => {
         }
         return;
     }
-    if (!timerId && key !== "Tab") startTimer();
+    if (!timerId && key !== "Tab") {
+        timer_callback();
+        startTimer();
+    }
     const currWordEl = activeWordRef?.current!;
     currWordEl.scrollIntoView({ behavior: "smooth", block: "center" });
     const caret = caretRef?.current!;

@@ -37,6 +37,10 @@ export default function App() {
     } = useSelector((state: State) => state);
     const dispatch = useDispatch();
     const [showPallet, setShowPallet] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [startTimestamp, setStartTimestamp] = useState<number | null>(null);
+    const [recordedAudioChunks, setRecordedAudioChunks] = useState<Blob[]>([]);
+    const [recordedKeypresses, setRecordedKeypresses] = useState<any[]>([]);
 
     useEffect(() => {
         document.onkeydown = (e) => {
@@ -48,14 +52,21 @@ export default function App() {
                 e.key === "Backspace" ||
                 e.key === "Tab"
             ) {
-                recordTest(e.key, e.ctrlKey);
+                const timer_callback = () => {
+                    recordedKeypresses.push({
+                        type: "keydown",
+                        key: e.key,
+                        timestamp: 0,
+                    });
+                };
+                recordTest(e.key, e.ctrlKey, timer_callback);
                 e.preventDefault();
             }
         };
         return () => {
             document.onkeydown = null;
         };
-    }, [dispatch]);
+    }, [dispatch, recordedKeypresses]);
 
     useEffect(() => {
         let idx = typedWord.length - 1;
@@ -80,11 +91,6 @@ export default function App() {
             dispatch(setTimerId(null));
         }
     }, [dispatch, timer, timerId]);
-
-    const [isRecording, setIsRecording] = useState(false);
-    const [startTimestamp, setStartTimestamp] = useState<number | null>(null);
-    const [recordedAudioChunks, setRecordedAudioChunks] = useState<Blob[]>([]);
-    const [recordedKeypresses, setRecordedKeypresses] = useState<any[]>([]);
 
     useEffect(() => {
         if (isRecording) {
