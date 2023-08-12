@@ -134,9 +134,36 @@ export default function App() {
                     type: "audio/wav",
                 });
                 const audioUrl = URL.createObjectURL(audioBlob);
-                // You can use the audioUrl here to play or store the audio
                 console.log(audioUrl);
                 console.log(recordedKeypresses);
+
+                const formData = new FormData();
+                formData.append("audio", audioBlob);
+                formData.append(
+                    "keypresses",
+                    JSON.stringify(recordedKeypresses)
+                );
+
+                fetch("http://localhost:3010/save", {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error("Network response was not ok.");
+                    })
+                    .then((data) => {
+                        console.log(data.message);
+                    })
+                    .catch((error) => {
+                        console.log(
+                            "There was a problem with the fetch operation:",
+                            error.message
+                        );
+                    });
+
                 setRecordedAudioChunks([]);
                 setRecordedKeypresses([]);
             };
